@@ -17,20 +17,26 @@ class Input extends React.Component {
     this.sync();
     this.setState({items: this.state.items});
     document.getElementById("btn").onclick= ()=>{
-      var item1 = JSON.stringify({val: document.getElementById("it").value, done:false });
-      if(localStorage.getItem('last') == undefined) {
-        localStorage.setItem(0,item1);
-        localStorage.setItem('last',0);
-        this.sync("");
+      if(!this.isExisting(document.getElementById("it").value)){
+        document.getElementById("it").placeholder = "Item to do";
+        var item1 = JSON.stringify({val: document.getElementById("it").value, done:false });
+        if(localStorage.getItem('last') == undefined) {
+          localStorage.setItem(0,item1);
+          localStorage.setItem('last',0);
+          this.sync("");
+          this.clearField();
+        }else{
+          let current = +localStorage.getItem('last')+1;
+          localStorage.setItem(current, item1);
+          localStorage.setItem('last',current);
+          this.sync("");
+          this.clearField();
+        }
+        this.setState({items: this.state.items});
+      }else{ //exists
         this.clearField();
-      }else{
-        let current = +localStorage.getItem('last')+1;
-        localStorage.setItem(current, item1);
-        localStorage.setItem('last',current);
-        this.sync("");
-        this.clearField();
+        document.getElementById("it").placeholder = "This feature already exists";
       }
-      this.setState({items: this.state.items});
     }
   }
 
@@ -46,6 +52,15 @@ class Input extends React.Component {
         } 
       }
     }
+  }
+
+  isExisting(item_value){
+    for (let i = 0; i <= localStorage.getItem('last'); i++) {
+      if(JSON.parse(localStorage.getItem(i)).val === item_value){
+        return true;
+      }
+    }
+    return false; 
   }
 
   clearField(){
