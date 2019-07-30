@@ -20,7 +20,7 @@ class Input extends React.Component {
       if(!this.isExisting(document.getElementById("it").value)){
         document.getElementById("it").placeholder = "Item to do";
         var item1 = JSON.stringify({val: document.getElementById("it").value, done:false });
-        if(localStorage.getItem('last') == undefined) {
+        if( (localStorage.getItem('last') == undefined) ||  (localStorage.getItem('last') == -1)) {
           localStorage.setItem(0,item1);
           localStorage.setItem('last',0);
           this.sync("");
@@ -45,9 +45,9 @@ class Input extends React.Component {
       this.state.items.push(<Item id={localStorage.getItem('last')} txt={JSON.parse(localStorage.getItem(localStorage.getItem('last'))).val} key={Math.random()}/>);
       
     }else{
-      if(localStorage.getItem('last') != undefined) {
+      if((localStorage.getItem('last') != undefined) &&  (localStorage.getItem('last') != -1)) {
         for (let i = 0; i <= localStorage.getItem('last'); i++) {
-          
+          if (localStorage.getItem(i) != null) 
           this.state.items.push(<Item id={i} txt={JSON.parse(localStorage.getItem(i)).val} checked={JSON.parse(localStorage.getItem(i)).done} key={Math.random()}/>);
         } 
       }
@@ -55,9 +55,13 @@ class Input extends React.Component {
   }
 
   isExisting(item_value){
-    for (let i = 0; i <= localStorage.getItem('last'); i++) {
-      if(JSON.parse(localStorage.getItem(i)).val === item_value){
-        return true;
+    if((localStorage.getItem('last') != undefined) &&  (localStorage.getItem('last') != -1)){
+      for (let i = 0; i <= localStorage.getItem('last'); i++) {
+        if (localStorage.getItem(i) != null) {
+          if(JSON.parse(localStorage.getItem(i)).val === item_value){
+            return true;
+          }
+        }
       }
     }
     return false; 

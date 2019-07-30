@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap');
+
 .todo{
   min-height: 90%;
   width: 40%;
@@ -20,5 +22,11 @@
   flex-direction: row;
   width: auto;
   justify-content: flex-start;
+
   align-items: center;
+}
+
+.text{
+  font-size: 2em;
+  font-family: 'Montserrat', sans-serif;
 }
