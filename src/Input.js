@@ -11,6 +11,8 @@ class Input extends React.Component {
     this.state = {
       items: []
     };
+    this.upd = this.upd.bind(this);
+    this.async = this.async.bind(this);
   }
 
   componentDidMount(){
@@ -25,6 +27,7 @@ class Input extends React.Component {
           localStorage.setItem('last',0);
           this.sync("");
           this.clearField();
+          
         }else{
           let current = +localStorage.getItem('last')+1;
           localStorage.setItem(current, item1);
@@ -33,11 +36,36 @@ class Input extends React.Component {
           this.clearField();
         }
         this.setState({items: this.state.items});
+        this.listenDelete();
       }else{ //exists
         this.clearField();
         document.getElementById("it").placeholder = "This feature already exists";
       }
+      
     }
+  }
+
+  listenDelete(){
+    var buttons = document.querySelectorAll(".mybtn");
+    if(buttons[0] != undefined ){ //eventListener
+      console.log("Buttons !null");
+      console.log(buttons);
+     /*buttons[0].onclick = () => {
+        console.log("CLICK!")
+      }*/
+      console.log(buttons[0]);
+      for (let i = 0; i < buttons.length; i++) {
+
+        buttons[i].addEventListener('click', this.upd);
+      }
+    }
+  }
+
+  upd(){
+    console.log("mybtn Clicked!");
+    
+    this.async();
+
   }
 
   sync(item) {
@@ -52,6 +80,26 @@ class Input extends React.Component {
         } 
       }
     }
+  }
+
+  async(){
+    setTimeout(()=>{
+      this.setState({items: []});
+      console.log("async called");
+      if((localStorage.getItem('last') != undefined) &&  (localStorage.getItem('last') != -1)) {
+        for (let i = 0; i <= localStorage.getItem('last'); i++) {
+          if (localStorage.getItem(i) != null) 
+          this.state.items.push(<Item id={i} txt={JSON.parse(localStorage.getItem(i)).val} checked={JSON.parse(localStorage.getItem(i)).done} key={Math.random()}/>);
+        } 
+      }else if(localStorage.getItem('last') == -1) {
+        this.setState({items: []});
+      }
+      if(this.state.items != undefined){
+        this.setState({items: this.state.items});
+      }else{
+        this.setState({items: []});
+      }
+    }, 100);
   }
 
   isExisting(item_value){
@@ -71,6 +119,9 @@ class Input extends React.Component {
     document.querySelector("#it").value = '';
   }
 
+  handleChange(){
+    this.setState({items: this.state.items});
+  }
   render() {
     return (
     <div>
@@ -86,9 +137,11 @@ class Input extends React.Component {
         </InputGroup.Append>
         
       </InputGroup>
-      {this.state.items.map(item => (
-        item
-        ))}
+      <div onChange={this.handleChange.bind(this)}>
+        {this.state.items.map(item => (
+          item
+          ))}
+      </div>
     </div>
     )
   }

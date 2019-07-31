@@ -23,10 +23,16 @@ class Item extends React.Component {
   }
   
   removeItem(){
-    if(localStorage.getItem('last') === this.props.id){
-      localStorage.setItem('last', this.props.id-1)
+    if( (localStorage.getItem('last') == this.props.id) && (this.props.id != 0) ){
+      for (let i = 1; i <= localStorage.getItem('last'); i++) {
+        if(localStorage.getItem(this.props.id-i) != undefined){
+          localStorage.setItem('last', this.props.id-i)
+          break;
+        }
+      }
     }
-    if( (this.props.id === 0) && (localStorage.getItem('last') === this.props.id)){
+    if( (this.props.id == 0) && (localStorage.getItem('last') === this.props.id)){
+      console.log("ITS 0 & ITS LAST");
       localStorage.setItem('last', -1)
     }
     localStorage.removeItem(this.props.id);
@@ -40,14 +46,14 @@ class Item extends React.Component {
       return(
       <div className="list_item ">
         <div className="text" id="text" style={textd}>{this.props.txt}</div>
-        <Button variant="danger" size="sm" onClick={this.removeItem}>X</Button>
+        <Button variant="danger" size="sm" className="mybtn" onClick={this.removeItem}>X</Button>
       </div>)
     }else{
-      return(
+      return( 
         <div className="list_item ">
           <InputGroup.Checkbox aria-label="Checkbox for following text input" onChange={this.checkOut}/>
           <div className="text" id="text" >{this.props.txt}</div>
-          <Button variant="danger" size="sm" onClick={this.removeItem}>X</Button>
+          <Button variant="danger" size="sm" className="mybtn" onClick={this.removeItem}>X</Button>
         </div>)
     }
   }
