@@ -23,12 +23,18 @@ class Item extends React.Component {
   }
   
   removeItem(){
+    var flag = false;
     if( (localStorage.getItem('last') == this.props.id) && (this.props.id != 0) ){
       for (let i = 1; i <= localStorage.getItem('last'); i++) {
         if(localStorage.getItem(this.props.id-i) != undefined){
+          flag = true;
           localStorage.setItem('last', this.props.id-i)
           break;
         }
+      }
+      if(!flag){
+        console.log("ITS !0 & ITS LAST");
+        localStorage.setItem('last', -1)  
       }
     }
     if( (this.props.id == 0) && (localStorage.getItem('last') === this.props.id)){

@@ -11,7 +11,6 @@ class Input extends React.Component {
     this.state = {
       items: []
     };
-    this.upd = this.upd.bind(this);
     this.async = this.async.bind(this);
   }
 
@@ -27,7 +26,6 @@ class Input extends React.Component {
           localStorage.setItem('last',0);
           this.sync("");
           this.clearField();
-          
         }else{
           let current = +localStorage.getItem('last')+1;
           localStorage.setItem(current, item1);
@@ -36,36 +34,28 @@ class Input extends React.Component {
           this.clearField();
         }
         this.setState({items: this.state.items});
-        this.listenDelete();
       }else{ //exists
         this.clearField();
         document.getElementById("it").placeholder = "This feature already exists";
       }
-      
     }
+    this.listenDelete();
+  }
+
+  componentDidUpdate(){
+    this.listenDelete();
   }
 
   listenDelete(){
-    var buttons = document.querySelectorAll(".mybtn");
+    console.log("ListDel() called");
+    var buttons = document.getElementsByClassName("mybtn");
     if(buttons[0] != undefined ){ //eventListener
-      console.log("Buttons !null");
-      console.log(buttons);
-     /*buttons[0].onclick = () => {
-        console.log("CLICK!")
-      }*/
-      console.log(buttons[0]);
+      console.log("buttons[0] != undefined");
       for (let i = 0; i < buttons.length; i++) {
-
-        buttons[i].addEventListener('click', this.upd);
+        console.log("Adding eventlistener for: "+i+"element..");
+        buttons[i].addEventListener('click', this.async);
       }
     }
-  }
-
-  upd(){
-    console.log("mybtn Clicked!");
-    
-    this.async();
-
   }
 
   sync(item) {
@@ -83,6 +73,7 @@ class Input extends React.Component {
   }
 
   async(){
+    console.log("mybtn Clicked!");
     setTimeout(()=>{
       this.setState({items: []});
       console.log("async called");
@@ -99,6 +90,7 @@ class Input extends React.Component {
       }else{
         this.setState({items: []});
       }
+      console.log("Items: "+this.state.items);
     }, 100);
   }
 
