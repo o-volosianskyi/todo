@@ -33,12 +33,10 @@ class Item extends React.Component {
         }
       }
       if(!flag){
-        console.log("ITS !0 & ITS LAST");
         localStorage.setItem('last', -1)  
       }
     }
     if( (this.props.id == 0) && (localStorage.getItem('last') === this.props.id)){
-      console.log("ITS 0 & ITS LAST");
       localStorage.setItem('last', -1)
     }
     localStorage.removeItem(this.props.id);
@@ -57,7 +55,7 @@ class Item extends React.Component {
     }else{
       return( 
         <div className="list_item ">
-          <InputGroup.Checkbox aria-label="Checkbox for following text input" onChange={this.checkOut}/>
+          <InputGroup.Checkbox aria-label="Checkbox for following text input" class="checkb" onChange={this.checkOut}/>
           <div className="text" id="text" >{this.props.txt}</div>
           <Button variant="danger" size="sm" className="mybtn" onClick={this.removeItem}>X</Button>
         </div>)

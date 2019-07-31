@@ -39,21 +39,24 @@ class Input extends React.Component {
         document.getElementById("it").placeholder = "This feature already exists";
       }
     }
-    this.listenDelete();
+    this.itemListeners();
   }
 
   componentDidUpdate(){
-    this.listenDelete();
+    this.itemListeners();
   }
 
-  listenDelete(){
-    console.log("ListDel() called");
+  itemListeners(){
     var buttons = document.getElementsByClassName("mybtn");
+    var checkboxes = document.getElementsByClassName("checkb");
     if(buttons[0] != undefined ){ //eventListener
-      console.log("buttons[0] != undefined");
       for (let i = 0; i < buttons.length; i++) {
-        console.log("Adding eventlistener for: "+i+"element..");
         buttons[i].addEventListener('click', this.async);
+      }
+    }
+    if(checkboxes[0] != undefined ){ //eventListener
+      for (let i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].addEventListener('click', this.async);
       }
     }
   }
@@ -73,10 +76,8 @@ class Input extends React.Component {
   }
 
   async(){
-    console.log("mybtn Clicked!");
     setTimeout(()=>{
       this.setState({items: []});
-      console.log("async called");
       if((localStorage.getItem('last') != undefined) &&  (localStorage.getItem('last') != -1)) {
         for (let i = 0; i <= localStorage.getItem('last'); i++) {
           if (localStorage.getItem(i) != null) 
@@ -90,7 +91,6 @@ class Input extends React.Component {
       }else{
         this.setState({items: []});
       }
-      console.log("Items: "+this.state.items);
     }, 100);
   }
 
