@@ -1,6 +1,8 @@
 import React from 'react';
 import Button from 'react-bootstrap/Button';
 import InputGroup from 'react-bootstrap/InputGroup';
+import axios from 'axios';
+
 
 class Item extends React.Component {
 
@@ -8,7 +10,6 @@ class Item extends React.Component {
     super(props);
     this.state = {
       checked: localStorage.getItem(this.props.id).done,
-      id: this.props.id,
       text: this.props.txt
     };
     this.checkOut = this.checkOut.bind(this);
@@ -17,30 +18,21 @@ class Item extends React.Component {
   }
 
   checkOut(){
-    var item1 = JSON.stringify({val: this.props.txt, done:true });
-    localStorage.setItem(this.props.id, item1);
-    this.setState({checked: localStorage.getItem(this.props.id).done, id: this.state.id, text: this.state.text});
+  
+    axios.post(`/items/checkout`, {text: this.state.text})
+      .then(res => {
+        if( res.status == '200')
+          this.setState({checked: true, text: this.state.text});
+
+      });
   }
   
   removeItem(){
-    var flag = false;
-    if( (localStorage.getItem('last') == this.props.id) && (this.props.id != 0) ){
-      for (let i = 1; i <= localStorage.getItem('last'); i++) {
-        if(localStorage.getItem(this.props.id-i) != undefined){
-          flag = true;
-          localStorage.setItem('last', this.props.id-i)
-          break;
-        }
-      }
-      if(!flag){
-        localStorage.setItem('last', -1)  
-      }
-    }
-    if( (this.props.id == 0) && (localStorage.getItem('last') === this.props.id)){
-      localStorage.setItem('last', -1)
-    }
-    localStorage.removeItem(this.props.id);
-    this.setState({checked: true, id: this.state.id, text: this.state.text});
+    axios.delete(`/items/destroy`, {text: this.state.text})
+    .then(res => {
+      if( res.status == '200')
+        this.setState({checked: true, text: this.state.text});
+    });
 
   }
 
@@ -64,7 +56,6 @@ class Item extends React.Component {
 
   render() {
     this.state.checked = this.props.checked;
-    this.state.id=this.props.id;
     this.state.text=this.props.txt;
     return (
       this.itemState()
