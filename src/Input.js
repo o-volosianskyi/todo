@@ -3,6 +3,7 @@ import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Item from './Item'
+import axios from 'axios';
 
 class Input extends React.Component {
 
@@ -11,47 +12,82 @@ class Input extends React.Component {
     this.state = {
       items: []
     };
+    this.async = this.async.bind(this);
   }
 
   componentDidMount(){
     this.sync();
-    this.setState({items: this.state.items});
+    
     document.getElementById("btn").onclick= ()=>{
-      var item1 = JSON.stringify({val: document.getElementById("it").value, done:false });
-      if(localStorage.getItem('last') == undefined) {
-        localStorage.setItem(0,item1);
-        localStorage.setItem('last',0);
-        this.sync("");
+      if(!this.isExisting(document.getElementById("it").value)){
+        document.getElementById("it").placeholder = "Item to do";
+        var item1 = {text: document.getElementById("it").value, done:false };
+        
+        axios.post(`/items/create`, item1)
+          .then(res => {
+            if(res.status == "200"){
+              this.state.items.push(<Item txt={document.getElementById("it").value} key={Math.random()}/>);
+            }
+          });
+
+        this.setState({items: this.state.items});
+      }else{ //exists
         this.clearField();
-      }else{
-        let current = +localStorage.getItem('last')+1;
-        localStorage.setItem(current, item1);
-        localStorage.setItem('last',current);
-        this.sync("");
-        this.clearField();
+        document.getElementById("it").placeholder = "This feature already exists";
       }
-      this.setState({items: this.state.items});
+    }
+    this.itemListeners();
+  }
+
+  componentDidUpdate(){
+    this.itemListeners();
+  }
+
+  itemListeners(){
+    var buttons = document.getElementsByClassName("mybtn");
+    var checkboxes = document.getElementsByClassName("checkb");
+    if(buttons[0] != undefined ){ //eventListener
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener('click', this.async);
+      }
+    }
+    if(checkboxes[0] != undefined ){ //eventListener
+      for (let i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].addEventListener('click', this.async);
+      }
     }
   }
 
-  sync(item) {
-    if (item != undefined) {
-      this.state.items.push(<Item id={localStorage.getItem('last')} txt={JSON.parse(localStorage.getItem(localStorage.getItem('last'))).val} key={Math.random()}/>);
-      
-    }else{
-      if(localStorage.getItem('last') != undefined) {
-        for (let i = 0; i <= localStorage.getItem('last'); i++) {
-          
-          this.state.items.push(<Item id={i} txt={JSON.parse(localStorage.getItem(i)).val} checked={JSON.parse(localStorage.getItem(i)).done} key={Math.random()}/>);
-        } 
-      }
-    }
+  sync() {
+    axios.get(`/items/index`, {msg: "read"})
+      .then(res => {
+        this.setState({items: res.items});
+      });
+  }
+
+  async(){
+    setTimeout(()=>{
+      this.setState({items: []});
+      this.sync();
+    }, 100);
+  }
+
+  isExisting(item_value){
+    axios.get(`/items/show`, {text: item_value})
+      .then(res => {
+        if( res.item != null)
+          return true;
+      });
+    return false; 
   }
 
   clearField(){
     document.querySelector("#it").value = '';
   }
 
+  handleChange(){
+    this.setState({items: this.state.items});
+  }
   render() {
     return (
     <div>
@@ -67,9 +103,11 @@ class Input extends React.Component {
         </InputGroup.Append>
         
       </InputGroup>
-      {this.state.items.map(item => (
-        item
-        ))}
+      <div onChange={this.handleChange.bind(this)}>
+        {this.state.items.map(item => (
+          item
+          ))}
+      </div>
     </div>
     )
   }
